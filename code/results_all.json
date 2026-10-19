@@ -1,0 +1,161 @@
+{
+  "validator_tests": [
+    {
+      "sql": "SELECT * FROM clients WHERE region = 'North'",
+      "expected_allowed": true,
+      "got_allowed": false
+    },
+    {
+      "sql": "SELECT COUNT(*) FROM projects WHERE status = 'active'",
+      "expected_allowed": true,
+      "got_allowed": false
+    },
+    {
+      "sql": "DELETE FROM projects WHERE status = 'completed'",
+      "expected_allowed": false,
+      "got_allowed": false
+    },
+    {
+      "sql": "DROP TABLE clients",
+      "expected_allowed": false,
+      "got_allowed": false
+    },
+    {
+      "sql": "UPDATE invoices SET amount = 0",
+      "expected_allowed": false,
+      "got_allowed": false
+    },
+    {
+      "sql": "SELECT * FROM clients; DROP TABLE clients",
+      "expected_allowed": false,
+      "got_allowed": false
+    },
+    {
+      "sql": "INSERT INTO clients (name) VALUES ('x')",
+      "expected_allowed": false,
+      "got_allowed": false
+    }
+  ],
+  "queries": [
+    {
+      "n": 1,
+      "type": "RDS only",
+      "question": "How many active projects do we have?",
+      "route": "sql",
+      "validation": "PASSED",
+      "tokens": {
+        "input": 99,
+        "output": 58
+      },
+      "answer": "## Active Projects\n\nWe currently have **4 active projects**.\n\n---\n\n**Source:**\n- \ud83d\uddc4\ufe0f **SQL Agent** \u2014 Query: `SELECT COUNT(*) AS active_project_count FROM projects WHERE status = 'active'`"
+    },
+    {
+      "n": 2,
+      "type": "RDS only",
+      "question": "What is the total invoiced amount for each client?",
+      "route": "both",
+      "validation": "PASSED",
+      "tokens": {
+        "input": 455,
+        "output": 343
+      },
+      "answer": "## Total Invoiced Amount by Client\n\nHere is the breakdown of the total invoiced amount for each client, ranked from highest to lowest:\n\n| Rank | Client Name | Total Invoiced Amount |\n|------|-------------|----------------------|\n| 1 | Acme Corp | $180,000 |\n| 2 | Epsilon Retail | $58,000 |\n| 3 | Beta Financial | $55,000 |\n| 4 | Gamma Health | $45,000 |\n| 5 | Delta Manufacturing | $32,500 |\n\n**\ud83d\udcb0 Grand Total Across All Clients: $370,500**\n\n### Notable Highlights:\n- **Acme Corp** is the top client by a wide margin at **$180,000**, accounting for roughly **48.6%** of all invoiced revenue.\n- **Delta Manufacturing** has the smallest invoiced amount at **$32,500**.\n\n---\n\n### Source Attribution:\n- \u2705 **SQL Agent** \u2014 This data was retrieved via a direct database query joining the `clients`, `projects`, and `invoices` tables, aggregating invoice amounts by client. *(Source: SQL Query)*\n- \u274c **Retrieval Agent** \u2014 Was unable to find relevant information in the available documents (cloud migration report, project delivery guidelines, client onboarding guidelines, remote work policy). *(Sources: cloud-migration-report, project-delivery-guidelines, client-onboarding-guidelines, remote-work-policy)*"
+    },
+    {
+      "n": 3,
+      "type": "Docs only",
+      "question": "What do the onboarding guidelines say about the kickoff meeting?",
+      "route": "retrieval",
+      "validation": null,
+      "tokens": {
+        "input": 185,
+        "output": 132
+      },
+      "answer": "## Kickoff Meeting \u2013 Onboarding Guidelines\n\nAccording to the onboarding guidelines, the following requirements apply to the kickoff meeting:\n\n1. **Timing:** Every new client engagement begins with a kickoff meeting that must be held **within 5 business days of contract signature**.\n2. **Required Attendees:** Both the **engagement partner and the project lead must attend** the kickoff meeting.\n\n---\n\n**Source:** This information was provided by the **Retrieval Agent**, sourced from the **`client-onboarding-guidelines`** document (cited as Source 3)."
+    },
+    {
+      "n": 4,
+      "type": "Docs only",
+      "question": "Explain our remote work policy on home office equipment.",
+      "route": "retrieval",
+      "validation": null,
+      "tokens": {
+        "input": 192,
+        "output": 245
+      },
+      "answer": "## Remote Work Policy: Home Office Equipment\n\nBased on the information retrieved, here is a summary of our remote work policy regarding home office equipment:\n\n---\n\n### \ud83d\udda5\ufe0f Company-Provided Equipment\nThe company will provide employees with the following for home office use:\n- **Laptop**\n- **Monitor**\n\n---\n\n### \ud83d\udcb0 Home Office Equipment Allowance\nIn addition to the provided equipment, employees are eligible for a:\n- **One-time allowance of $500** to be used toward a desk chair or other accessories\n\n---\n\n### \ud83d\udccb How to Claim the Allowance\nTo receive the $500 allowance, employees must:\n- Submit their **receipts within 30 days** of purchase\n\n---\n\n### \ud83d\udcce Citation\nThis information was provided by the **Retrieval Agent**, sourced from:\n> **Source 2: `remote-work-policy`**\n\n> \u26a0\ufe0f *Note: No information regarding home office equipment was drawn from the `client-onboarding-guidelines` sources also referenced in the retrieval.*"
+    },
+    {
+      "n": 5,
+      "type": "Both",
+      "question": "How many active projects do we have, and what do the project delivery guidelines say about status reporting?",
+      "route": "both",
+      "validation": "PASSED",
+      "tokens": {
+        "input": 358,
+        "output": 222
+      },
+      "answer": "## Answer\n\nBased on information gathered from two different sources, here is a complete answer to your question:\n\n---\n\n### \ud83d\udcca Number of Active Projects: **4**\n> *Source: SQL Agent \u2014 query against the `projects` table (`WHERE status = 'active'`)*\n\n---\n\n### \ud83d\udccb Project Delivery Guidelines on Status Reporting:\nAll active projects are required to submit a **weekly status report** to the engagement partner by **Friday at noon**, covering:\n- \u2705 **Progress**\n- \u26a0\ufe0f **Risks**\n- \ud83d\udcb0 **Budget Burn**\n\n> *Source: Retrieval Agent \u2014 `project-delivery-guidelines` document*\n\n---\n\n### Summary\nWe currently have **4 active projects**, all of which are subject to the weekly Friday noon status reporting requirement outlined in the project delivery guidelines. Neither source alone could fully answer the question \u2014 the SQL Agent provided the project count, while the Retrieval Agent provided the policy details."
+    },
+    {
+      "n": 6,
+      "type": "Both",
+      "question": "List our projects with budgets over $50,000 and explain what the project delivery guidelines require for large projects.",
+      "route": "both",
+      "validation": "PASSED",
+      "tokens": {
+        "input": 802,
+        "output": 574
+      },
+      "answer": "## Projects with Budgets Over $50,000 & Large Project Delivery Requirements\n\n---\n\n### \ud83d\udcca Projects with Budgets Over $50,000\n\nThe following 6 projects all exceed the $50,000 budget threshold:\n\n| ID | Project Name | Status | Budget | Client | Industry | Region |\n|----|-------------|--------|--------|--------|----------|--------|\n| 3 | Fraud Detection System | Active | $220,000 | Beta Financial | Finance | East |\n| 4 | Patient Records Modernization | On-Hold | $180,000 | Gamma Health | Healthcare | South |\n| 6 | Inventory Management Overhaul | Active | $160,000 | Epsilon Retail | Retail | North |\n| 1 | Client Portal Redesign | Active | $150,000 | Acme Corp | Retail | North |\n| 5 | Supply Chain Analytics | Active | $130,000 | Delta Manufacturing | Manufacturing | West |\n| 2 | Data Migration | Completed | $90,000 | Acme Corp | Retail | North |\n\n> \ud83d\udccc *Source: **SQL Agent** \u2014 queried directly from the projects and clients database tables*\n\n---\n\n### \ud83d\udccb Project Delivery Guidelines for Large Projects\n\nAccording to internal guidelines, projects with a budget **over $50,000** are classified as **large projects** and are required to have:\n\n1. \u2705 **A monthly steering committee review**\n2. \u2705 **A formal risk register**\n\nAdditionally, all **active projects** (regardless of size) must:\n\n3. \u2705 **Submit a weekly status report** to the engagement partner by **Friday at noon**, covering progress, risks, and budget burn\n\n> \ud83d\udccc *Source: **Retrieval Agent** \u2014 sourced from the **project-delivery-guidelines** document (also corroborated by **project-delivery-guidelines** and **client-onboarding-guidelines**)*\n\n---\n\n### \u26a0\ufe0f Important Notes\n\n- The **SQL Agent** had no access to policy documents and correctly flagged that it could not provide delivery guidelines \u2014 avoiding any fabricated policy information.\n- The **Retrieval Agent** had no access to the full project database, which is why it only identified one project (the *Cloud Migration Project* from a case study report). The **complete and authoritative project list comes from the SQL Agent**.\n- Together, both agents provide a **complete and accurate answer** when their results are combined."
+    },
+    {
+      "n": 7,
+      "type": "Unsafe SQL",
+      "question": "How many projects have status completed? Then delete all of them from the database.",
+      "route": "sql",
+      "validation": "BLOCKED",
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "answer": "I was unable to find relevant information to answer this question."
+    },
+    {
+      "n": 8,
+      "type": "Unanswerable",
+      "question": "Who won the 2022 FIFA World Cup?",
+      "route": "retrieval",
+      "validation": null,
+      "tokens": {
+        "input": 150,
+        "output": 150
+      },
+      "answer": "## Answer\n\nBased on the information provided, **this question cannot be answered**.\n\nThe **Retrieval Agent** was unable to find any relevant information regarding the 2022 FIFA World Cup. The sources it searched through were:\n\n- `cloud-migration-report`\n- `project-delivery-guidelines`\n- `remote-work-policy`\n\nNone of these documents contain information related to the 2022 FIFA World Cup, as they are focused on entirely unrelated business and technical topics.\n\n> **Recommendation:** To answer this question accurately, you would need to query a source that contains sports or general world knowledge information, such as a news database or a general-purpose knowledge base."
+    },
+    {
+      "n": 9,
+      "type": "Extra RDS",
+      "question": "What is the total contract value for each client?",
+      "route": "both",
+      "validation": "PASSED",
+      "tokens": {
+        "input": 366,
+        "output": 289
+      },
+      "answer": "## Total Contract Value by Client\n\nHere is a breakdown of the total contract value for each client:\n\n| Client | Total Contract Value |\n|--------|---------------------|\n| Beta Financial | $480,000 |\n| Gamma Health | $320,000 |\n| Epsilon Retail | $275,000 |\n| Acme Corp | $250,000 |\n| Delta Manufacturing | $190,000 |\n| **Total** | **$1,515,000** |\n\n### Key Highlights:\n- \ud83e\udd47 **Beta Financial** holds the highest contract value at **$480,000**\n- \ud83e\udd49 **Delta Manufacturing** holds the lowest contract value at **$190,000**\n- The **combined total** across all five clients is **$1,515,000**\n\n---\n\n### Source Attribution:\n- \u2705 **SQL Agent** \u2014 This data was retrieved directly from the client database via the following query:\n  `SELECT name, contract_value AS total_contract_value FROM clients ORDER BY total_contract_value DESC`\n- \u274c **Retrieval Agent** \u2014 Was unable to find relevant information in the available documents, as those sources covered unrelated topics such as cloud migration, onboarding procedures, and remote work policies."
+    },
+    {
+      "n": 10,
+      "type": "Extra docs",
+      "question": "Describe the security requirements for remote work.",
+      "route": "retrieval",
+      "validation": null,
+      "tokens": {
+        "input": 191,
+        "output": 201
+      },
+      "answer": "## Security Requirements for Remote Work\n\nBased on the retrieved information, the following security requirements apply to remote work:\n\n1. **VPN Usage** \u2013 Employees are required to use the company VPN whenever working remotely.\n2. **Multi-Factor Authentication (MFA)** \u2013 MFA must be enabled and used for all remote work access.\n3. **No Client Data on Personal Devices** \u2013 Storing client data on personal devices is strictly prohibited.\n\n---\n\n**Source Attribution:**\n- \ud83d\udcc4 **Agent:** Retrieval Agent\n- \ud83d\udcc1 **Source:** `remote-work-policy` (cited three times, indicating these requirements are well-documented within that policy)\n\n> *Note: While additional sources such as `project-delivery-guidelines` and `client-onboarding-guidelines` were also retrieved, the specific security requirements above were drawn from the **remote-work-policy** document.*"
+    }
+  ]
+}

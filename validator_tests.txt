@@ -1,0 +1,76 @@
+===== validate_sql source =====
+def validate_sql(query: str) -> dict:
+    """
+    Validates a Claude-generated SQL query before execution.
+    Blocks any query that is not a SELECT or contains destructive keywords.
+    Uses word-boundary matching to avoid false positives on column names
+    like 'deleted_at'.
+    """
+    query_upper = query.upper().strip()
+    padded = f" {query_upper} "
+
+    for keyword in BLOCKED_KEYWORDS:
+        if f" {keyword} " in padded or query_upper.startswith(keyword + " ") or query_upper == keyword:
+            return {
+                "valid": False,
+                "reason": f"Blocked: '{keyword}' is not permitted. Only SELECT queries are allowed."
+            }
+
+    if not query_upper.startswith("SELECT"):
+        return {
+            "valid": False,
+            "reason": "Only SELECT queries are permitted. Query must begin with SELECT."
+        }
+
+    # Block stacked queries (multiple statements separated by semicolons)
+    # A single trailing semicolon is fine; anything after it is not.
+    stripped = query.strip().rstrip(";")
+    if ";" in stripped:
+        return {
+            "valid": False,
+            "reason": "Blocked: multiple statements detected (possible stacked query attempt)."
+        }
+
+    return {"valid": True, "reason": "OK"}
+
+===== raw results =====
+{'valid': True, 'reason': 'OK'} <- SELECT * FROM clients WHERE region = 'North'
+{'valid': True, 'reason': 'OK'} <- SELECT COUNT(*) FROM projects WHERE status = 'active'
+{'valid': False, 'reason': "Blocked: 'DELETE' is not permitted. Only SELECT queries are allowed."} <- DELETE FROM projects WHERE status = 'completed'
+{'valid': False, 'reason': "Blocked: 'DROP' is not permitted. Only SELECT queries are allowed."} <- DROP TABLE clients
+{'valid': False, 'reason': "Blocked: 'UPDATE' is not permitted. Only SELECT queries are allowed."} <- UPDATE invoices SET amount = 0
+{'valid': False, 'reason': "Blocked: 'DROP' is not permitted. Only SELECT queries are allowed."} <- SELECT * FROM clients; DROP TABLE clients
+{'valid': False, 'reason': "Blocked: 'INSERT' is not permitted. Only SELECT queries are allowed."} <- INSERT INTO clients (name) VALUES ('x')
+===== validated_agent.py own test suite =====
+96:def run_test_suite():
+174:if __name__ == "__main__":
+Q: Show me everything
+Validation: PASSED
+Answer: ## All Data
+
+| client_id | client_name | industry | region | contract_value | created_date | project_id | project_name | project_status | start_date | end_date | budget | consultant_id | consultant_name | grade | specialisation | billable_hours | invoice_id | invoice_amount | invoice_status | due_date | paid_date |
+|-----------|-------------|----------|--------|---------------|--------------|------------|--------------|----------------|------------|----------|--------|---------------|-----------------|-------|----------------|----------------|------------|----------------|----------------|----------|-----------|
+| 1 | Acme Corp | Retail | North | 250,000 | 2025-01-15 | 1 | Client Portal Redesign | active | 2025-02-01 | None | 150,000 | 1 | Alice Chen | Senior | Frontend Engineering | 320 | 1 | 45,000 | paid | 2025-03-01 | 2025-02-28 |
+| 1 | Acme Corp | Retail | North | 250,000 | 2025-01-15 | 1 | Client Portal Redesign | active | 2025-02-01 | None | 150,000 | 1 | Alice Chen | Senior | Frontend Engineering | 320 | 2 | 45,000 | pending | 2025-05-01 | None |
+| 1 | Acme Corp | Retail | North | 250,000 | 2025-01-15 | 2 | Data Migration | completed | 2025-01-20 | 2025-03-15 | 90,000 | 2 | Bob Martinez | Manager | Data Engineering | 210 | 3 | 90,000 | paid | 2025-03-20 | 2025-03-18 |
+| 2 | Beta Financial | Finance | East | 480,000 | 2025-03-01 | 3 | Fraud Detection System | active | 2025-03-10 | None | 220,000
+
+SQL fed directly to execute_query_safely(): 'DROP TABLE clients'
+Validation: BLOCKED
+Error/result: Blocked: 'DROP' is not permitted. Only SELECT queries are allowed.
+
+SQL fed directly to execute_query_safely(): 'SELECT * FROM projects; DROP TABLE clients;'
+Validation: BLOCKED
+Error/result: Blocked: 'DROP' is not permitted. Only SELECT queries are allowed.
+
+======================================================================
+CONFIRMING LEGITIMATE QUESTIONS STILL WORK
+======================================================================
+
+Q: How many active projects do we have?
+Validation: PASSED
+Answer: We have **4** active projects.
+
+Q: What is the total contract value across all clients?
+Validation: PASSED
+Answer: The total contract value across all clients is **$1,515,000**.

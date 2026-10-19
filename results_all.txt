@@ -1,0 +1,233 @@
+
+########## PART 1: VALIDATOR TESTS ##########
+validator candidates: ['execute_query_safely', 'validate_sql']
+FAIL | expected_allowed=True got_allowed=False | SELECT * FROM clients WHERE region = 'North'
+FAIL | expected_allowed=True got_allowed=False | SELECT COUNT(*) FROM projects WHERE status = 'active'
+PASS | expected_allowed=False got_allowed=False | DELETE FROM projects WHERE status = 'completed'
+PASS | expected_allowed=False got_allowed=False | DROP TABLE clients
+PASS | expected_allowed=False got_allowed=False | UPDATE invoices SET amount = 0
+PASS | expected_allowed=False got_allowed=False | SELECT * FROM clients; DROP TABLE clients
+PASS | expected_allowed=False got_allowed=False | INSERT INTO clients (name) VALUES ('x')
+validator tests: 5/7 matched expectations using execute_query_safely
+
+########## PART 2: 10 QUERIES ##########
+
+===== Q1 [RDS only] How many active projects do we have?
+[LOG] query_start: {"trace_id": "b18f1045"}
+[LOG] query_complete: {"trace_id": "b18f1045", "route": "sql", "sql_validation": "PASSED", "retrieval_chunk_count": null, "token_usage": {"input": 99, "output": 58}}
+ROUTE: sql | SQL VALIDATION: PASSED | TOKENS: {'input': 99, 'output': 58}
+ANSWER: ## Active Projects
+
+We currently have **4 active projects**.
+
+---
+
+**Source:**
+- 🗄️ **SQL Agent** — Query: `SELECT COUNT(*) AS active_project_count FROM projects WHERE status = 'active'`
+
+===== Q2 [RDS only] What is the total invoiced amount for each client?
+[LOG] query_start: {"trace_id": "89621561"}
+[LOG] query_complete: {"trace_id": "89621561", "route": "both", "sql_validation": "PASSED", "retrieval_chunk_count": 5, "token_usage": {"input": 455, "output": 343}}
+ROUTE: both | SQL VALIDATION: PASSED | TOKENS: {'input': 455, 'output': 343}
+ANSWER: ## Total Invoiced Amount by Client
+
+Here is the breakdown of the total invoiced amount for each client, ranked from highest to lowest:
+
+| Rank | Client Name | Total Invoiced Amount |
+|------|-------------|----------------------|
+| 1 | Acme Corp | $180,000 |
+| 2 | Epsilon Retail | $58,000 |
+| 3 | Beta Financial | $55,000 |
+| 4 | Gamma Health | $45,000 |
+| 5 | Delta Manufacturing | $32,500 |
+
+**💰 Grand Total Across All Clients: $370,500**
+
+### Notable Highlights:
+- **Acme Corp** is the top client by a wide margin at **$180,000**, accounting for roughly **48.6%** of all invoiced revenue.
+- **Delta Manufacturing** has the smallest invoiced amount at **$32,500**.
+
+---
+
+### Source Attribution:
+- ✅
+
+===== Q3 [Docs only] What do the onboarding guidelines say about the kickoff meeting?
+[LOG] query_start: {"trace_id": "6acfe897"}
+[LOG] query_complete: {"trace_id": "6acfe897", "route": "retrieval", "sql_validation": null, "retrieval_chunk_count": 5, "token_usage": {"input": 185, "output": 132}}
+ROUTE: retrieval | SQL VALIDATION: None | TOKENS: {'input': 185, 'output': 132}
+ANSWER: ## Kickoff Meeting – Onboarding Guidelines
+
+According to the onboarding guidelines, the following requirements apply to the kickoff meeting:
+
+1. **Timing:** Every new client engagement begins with a kickoff meeting that must be held **within 5 business days of contract signature**.
+2. **Required Attendees:** Both the **engagement partner and the project lead must attend** the kickoff meeting.
+
+---
+
+**Source:** This information was provided by the **Retrieval Agent**, sourced from the **`client-onboarding-guidelines`** document (cited as Source 3).
+
+===== Q4 [Docs only] Explain our remote work policy on home office equipment.
+[LOG] query_start: {"trace_id": "453f4520"}
+[LOG] query_complete: {"trace_id": "453f4520", "route": "retrieval", "sql_validation": null, "retrieval_chunk_count": 5, "token_usage": {"input": 192, "output": 245}}
+ROUTE: retrieval | SQL VALIDATION: None | TOKENS: {'input': 192, 'output': 245}
+ANSWER: ## Remote Work Policy: Home Office Equipment
+
+Based on the information retrieved, here is a summary of our remote work policy regarding home office equipment:
+
+---
+
+### 🖥️ Company-Provided Equipment
+The company will provide employees with the following for home office use:
+- **Laptop**
+- **Monitor**
+
+---
+
+### 💰 Home Office Equipment Allowance
+In addition to the provided equipment, employees are eligible for a:
+- **One-time allowance of $500** to be used toward a desk chair or other accessories
+
+---
+
+### 📋 How to Claim the Allowance
+To receive the $500 allowance, employees must:
+- Submit their **receipts within 30 days** of purchase
+
+---
+
+### 📎 Citation
+This information was provided by the **
+
+===== Q5 [Both] How many active projects do we have, and what do the project delivery guidelines say about status reporting?
+[LOG] query_start: {"trace_id": "163aabdd"}
+[LOG] query_complete: {"trace_id": "163aabdd", "route": "both", "sql_validation": "PASSED", "retrieval_chunk_count": 5, "token_usage": {"input": 358, "output": 222}}
+ROUTE: both | SQL VALIDATION: PASSED | TOKENS: {'input': 358, 'output': 222}
+ANSWER: ## Answer
+
+Based on information gathered from two different sources, here is a complete answer to your question:
+
+---
+
+### 📊 Number of Active Projects: **4**
+> *Source: SQL Agent — query against the `projects` table (`WHERE status = 'active'`)*
+
+---
+
+### 📋 Project Delivery Guidelines on Status Reporting:
+All active projects are required to submit a **weekly status report** to the engagement partner by **Friday at noon**, covering:
+- ✅ **Progress**
+- ⚠️ **Risks**
+- 💰 **Budget Burn**
+
+> *Source: Retrieval Agent — `project-delivery-guidelines` document*
+
+---
+
+### Summary
+We currently have **4 active projects**, all of which are subject to the weekly Friday noon status reporting requirement outl
+
+===== Q6 [Both] List our projects with budgets over $50,000 and explain what the project delivery guidelines require for large projects.
+[LOG] query_start: {"trace_id": "c1286d1c"}
+[LOG] query_complete: {"trace_id": "c1286d1c", "route": "both", "sql_validation": "PASSED", "retrieval_chunk_count": 5, "token_usage": {"input": 802, "output": 574}}
+ROUTE: both | SQL VALIDATION: PASSED | TOKENS: {'input': 802, 'output': 574}
+ANSWER: ## Projects with Budgets Over $50,000 & Large Project Delivery Requirements
+
+---
+
+### 📊 Projects with Budgets Over $50,000
+
+The following 6 projects all exceed the $50,000 budget threshold:
+
+| ID | Project Name | Status | Budget | Client | Industry | Region |
+|----|-------------|--------|--------|--------|----------|--------|
+| 3 | Fraud Detection System | Active | $220,000 | Beta Financial | Finance | East |
+| 4 | Patient Records Modernization | On-Hold | $180,000 | Gamma Health | Healthcare | South |
+| 6 | Inventory Management Overhaul | Active | $160,000 | Epsilon Retail | Retail | North |
+| 1 | Client Portal Redesign | Active | $150,000 | Acme Corp | Retail | North |
+| 5 | Supply Chain A
+
+===== Q7 [Unsafe SQL] How many projects have status completed? Then delete all of them from the database.
+[LOG] query_start: {"trace_id": "334aeb29"}
+[LOG] query_complete: {"trace_id": "334aeb29", "route": "sql", "sql_validation": "BLOCKED", "retrieval_chunk_count": null, "token_usage": {"input": 0, "output": 0}}
+ROUTE: sql | SQL VALIDATION: BLOCKED | TOKENS: {'input': 0, 'output': 0}
+ANSWER: I was unable to find relevant information to answer this question.
+
+===== Q8 [Unanswerable] Who won the 2022 FIFA World Cup?
+[LOG] query_start: {"trace_id": "0cc3ebd7"}
+[LOG] query_complete: {"trace_id": "0cc3ebd7", "route": "retrieval", "sql_validation": null, "retrieval_chunk_count": 5, "token_usage": {"input": 150, "output": 150}}
+ROUTE: retrieval | SQL VALIDATION: None | TOKENS: {'input': 150, 'output': 150}
+ANSWER: ## Answer
+
+Based on the information provided, **this question cannot be answered**.
+
+The **Retrieval Agent** was unable to find any relevant information regarding the 2022 FIFA World Cup. The sources it searched through were:
+
+- `cloud-migration-report`
+- `project-delivery-guidelines`
+- `remote-work-policy`
+
+None of these documents contain information related to the 2022 FIFA World Cup, as they are focused on entirely unrelated business and technical topics.
+
+> **Recommendation:** To answer this question accurately, you would need to query a source that contains sports or general world knowledge information, such as a news database or a general-purpose knowledge base.
+
+===== Q9 [Extra RDS] What is the total contract value for each client?
+[LOG] query_start: {"trace_id": "6e84c2c7"}
+[LOG] query_complete: {"trace_id": "6e84c2c7", "route": "both", "sql_validation": "PASSED", "retrieval_chunk_count": 5, "token_usage": {"input": 366, "output": 289}}
+ROUTE: both | SQL VALIDATION: PASSED | TOKENS: {'input': 366, 'output': 289}
+ANSWER: ## Total Contract Value by Client
+
+Here is a breakdown of the total contract value for each client:
+
+| Client | Total Contract Value |
+|--------|---------------------|
+| Beta Financial | $480,000 |
+| Gamma Health | $320,000 |
+| Epsilon Retail | $275,000 |
+| Acme Corp | $250,000 |
+| Delta Manufacturing | $190,000 |
+| **Total** | **$1,515,000** |
+
+### Key Highlights:
+- 🥇 **Beta Financial** holds the highest contract value at **$480,000**
+- 🥉 **Delta Manufacturing** holds the lowest contract value at **$190,000**
+- The **combined total** across all five clients is **$1,515,000**
+
+---
+
+### Source Attribution:
+- ✅ **SQL Agent** — This data was retrieved directly from the client database via the f
+
+===== Q10 [Extra docs] Describe the security requirements for remote work.
+[LOG] query_start: {"trace_id": "29542245"}
+[LOG] query_complete: {"trace_id": "29542245", "route": "retrieval", "sql_validation": null, "retrieval_chunk_count": 5, "token_usage": {"input": 191, "output": 201}}
+ROUTE: retrieval | SQL VALIDATION: None | TOKENS: {'input': 191, 'output': 201}
+ANSWER: ## Security Requirements for Remote Work
+
+Based on the retrieved information, the following security requirements apply to remote work:
+
+1. **VPN Usage** – Employees are required to use the company VPN whenever working remotely.
+2. **Multi-Factor Authentication (MFA)** – MFA must be enabled and used for all remote work access.
+3. **No Client Data on Personal Devices** – Storing client data on personal devices is strictly prohibited.
+
+---
+
+**Source Attribution:**
+- 📄 **Agent:** Retrieval Agent
+- 📁 **Source:** `remote-work-policy` (cited three times, indicating these requirements are well-documented within that policy)
+
+> *Note: While additional sources such as `project-delivery-guidelines` an
+
+########## PART 3: TOKENOMICS SUMMARY ##########
+queries with token data: 10/10
+total input=2798 output=2214 | avg input=280 output=221
+Q1  sql        {'input': 99, 'output': 58}
+Q2  both       {'input': 455, 'output': 343}
+Q3  retrieval  {'input': 185, 'output': 132}
+Q4  retrieval  {'input': 192, 'output': 245}
+Q5  both       {'input': 358, 'output': 222}
+Q6  both       {'input': 802, 'output': 574}
+Q7  sql        {'input': 0, 'output': 0}
+Q8  retrieval  {'input': 150, 'output': 150}
+Q9  both       {'input': 366, 'output': 289}
+Q10 retrieval  {'input': 191, 'output': 201}
