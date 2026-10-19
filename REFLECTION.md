@@ -9,3 +9,5 @@ What didn't work: my document index was empty, so I made some fake documents to 
 Tokens for 10 queries: 2,798 input and 2,214 output.
 
 I didn't finish the Lambda, so there is no response.json or CloudWatch logs. I used the wrong zip file and ran out of time.
+
+Validator tests: I ran 5 tests. 3 passed validation and 2 were blocked. The results are in validator_tests.txt.
